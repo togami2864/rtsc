@@ -1,0 +1,1 @@
+"Brace Unicode escape \u{1F600} (grinning face)"

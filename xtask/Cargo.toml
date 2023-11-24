@@ -1,0 +1,15 @@
+[package]
+name = "xtask"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+rtsc_parser = { path = "../crates/rtsc_parser/" }
+walkdir = "2.3.1"
+tracing = "0.1.27"
+tracing-subscriber = "0.2.19"
+serde_json = "1.0.108"
+serde = { version = "1.0", features = ["derive"] }
+ansi_term = "0.12"
