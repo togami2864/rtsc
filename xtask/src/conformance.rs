@@ -10,12 +10,15 @@ use rtsc_parser::run_lexer;
 use tracing::info;
 use walkdir::WalkDir;
 
-use crate::suite::{Case, SuiteSummary, TestResult, TestSuite};
+use crate::{
+    suite::{Case, SuiteSummary, TestResult, TestSuite},
+    utils::remove_bom,
+};
 
 const FIXTURES_NAME: &str = "conformance";
 const FIXTURES_DIR: &str = "tests/conformance";
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct ConformanceTestCase {
     filename: String,
     code: String,
@@ -28,7 +31,7 @@ impl Case for ConformanceTestCase {
     {
         Self {
             filename: filename.to_owned(),
-            code: code.to_owned(),
+            code: remove_bom(code).to_owned(),
         }
     }
 
@@ -84,7 +87,6 @@ impl TestSuite for ConformanceTestSuite {
                 ConformanceTestCase::new(c.to_str().unwrap(), &contents)
             })
             .collect::<Vec<_>>();
-
         let total_count = cases.len();
 
         let mut success = 0;

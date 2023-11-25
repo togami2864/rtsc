@@ -1,8 +1,8 @@
 {
   "dir_name": "lexer",
-  "total_count": 109.0,
-  "success": 106.0,
+  "total_count": 124.0,
+  "success": 121.0,
   "failure": 0.0,
   "panic": 3.0,
-  "coverage": 97.24770642201835
+  "coverage": 97.58064516129032
 }

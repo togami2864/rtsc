@@ -10,7 +10,10 @@ use rtsc_parser::run_lexer;
 use tracing::info;
 use walkdir::WalkDir;
 
-use crate::suite::{Case, SuiteSummary, TestResult, TestSuite};
+use crate::{
+    suite::{Case, SuiteSummary, TestResult, TestSuite},
+    utils::remove_bom,
+};
 
 const FIXTURES_NAME: &str = "compiler";
 const FIXTURES_DIR: &str = "tests/compiler";
@@ -28,7 +31,7 @@ impl Case for CompilerTestCase {
     {
         Self {
             filename: filename.to_owned(),
-            code: code.to_owned(),
+            code: remove_bom(code).to_owned(),
         }
     }
 

@@ -8,6 +8,7 @@ mod compiler;
 mod conformance;
 mod lexer;
 mod suite;
+mod utils;
 fn main() {
     // std::panic::set_hook(Box::new(|_info| {}));
     let subscriber = tracing_subscriber::FmtSubscriber::new();

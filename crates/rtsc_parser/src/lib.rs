@@ -154,6 +154,22 @@ pub enum Keyword {
     While,
     With,
     Yield,
+    // ts
+    Any,
+    Boolean,
+    Declare,
+    Enum,
+    Implements,
+    Interface,
+    Module,
+    Namespace,
+    Number,
+    Private,
+    Protected,
+    Public,
+    Require,
+    String,
+    Symbol,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -563,7 +579,7 @@ impl<'a> Lexer<'a> {
                 }
                 '.' => {
                     self.last_pos = self.offset();
-                    match self.peek() {
+                    match self.cur() {
                         Some(c) if c.is_ascii_digit() => {
                             let value = self.read_number('.');
                             TokenKind::Number { value }
@@ -571,12 +587,13 @@ impl<'a> Lexer<'a> {
                         _ => TokenKind::Dot,
                     }
                 }
+
                 c => {
                     if is_ident_start(c) {
                         self.read_identifier(c)
                     } else {
                         self.last_pos = self.offset();
-                        panic!("{}", c)
+                        panic!("current char: {:?}", c)
                     }
                 }
             },
@@ -590,6 +607,11 @@ impl<'a> Lexer<'a> {
     fn read_next_token(&mut self) -> Token {
         self.skip_whitespace();
         let start = self.offset();
+        if let Some(c) = self.cur() {
+            if c == '\u{feff}' {
+                self.chars.next();
+            }
+        }
         let kind = self.read_next_kind();
         let end = self.last_pos;
         Token {
@@ -605,11 +627,33 @@ impl<'a> Lexer<'a> {
 
     fn read_identifier(&mut self, head: char) -> TokenKind {
         let mut ident = String::from(head);
-        while let Some(c) = self.chars.next() {
+        while let Some(c) = self.cur() {
             if is_ident_part(c) {
                 ident.push(c);
+                self.chars.next();
                 self.last_pos = self.offset();
-            } else if c.is_whitespace() {
+            } else if c.is_whitespace()
+                || c == ':'
+                || c == '<'
+                || c == '>'
+                || c == ';'
+                || c == '{'
+                || c == '}'
+                || c == '('
+                || c == ')'
+                || c == '['
+                || c == ']'
+                || c == '.'
+                || c == ','
+                || c == '?'
+                || c == '|'
+                || c == '+'
+                || c == '-'
+                || c == '*'
+                || c == '/'
+                || c == '='
+                || c == '\\'
+            {
                 break;
             } else {
                 self.errors.push(
@@ -622,6 +666,7 @@ impl<'a> Lexer<'a> {
                     )
                     .into(),
                 );
+                self.chars.next();
             }
         }
 
@@ -660,6 +705,25 @@ impl<'a> Lexer<'a> {
             "while" => TokenKind::Word(WordKind::Keyword(Keyword::While)),
             "with" => TokenKind::Word(WordKind::Keyword(Keyword::With)),
             "yield" => TokenKind::Word(WordKind::Keyword(Keyword::Yield)),
+            "null" => TokenKind::Word(WordKind::Null),
+            "true" => TokenKind::Word(WordKind::True),
+            "false" => TokenKind::Word(WordKind::False),
+
+            "any" => TokenKind::Word(WordKind::Keyword(Keyword::Any)),
+            "boolean" => TokenKind::Word(WordKind::Keyword(Keyword::Boolean)),
+            "declare" => TokenKind::Word(WordKind::Keyword(Keyword::Declare)),
+            "enum" => TokenKind::Word(WordKind::Keyword(Keyword::Enum)),
+            "implements" => TokenKind::Word(WordKind::Keyword(Keyword::Implements)),
+            "interface" => TokenKind::Word(WordKind::Keyword(Keyword::Interface)),
+            "module" => TokenKind::Word(WordKind::Keyword(Keyword::Module)),
+            "namespace" => TokenKind::Word(WordKind::Keyword(Keyword::Namespace)),
+            "number" => TokenKind::Word(WordKind::Keyword(Keyword::Number)),
+            "private" => TokenKind::Word(WordKind::Keyword(Keyword::Private)),
+            "protected" => TokenKind::Word(WordKind::Keyword(Keyword::Protected)),
+            "public" => TokenKind::Word(WordKind::Keyword(Keyword::Public)),
+            "require" => TokenKind::Word(WordKind::Keyword(Keyword::Require)),
+            "string" => TokenKind::Word(WordKind::Keyword(Keyword::String)),
+            "symbol" => TokenKind::Word(WordKind::Keyword(Keyword::Symbol)),
             _ => TokenKind::Word(WordKind::Identifier(ident)),
         }
     }
@@ -765,7 +829,7 @@ impl<'a> Lexer<'a> {
         }
         number
             .parse::<f64>()
-            .expect("failed to parse number as f64")
+            .unwrap_or_else(|_| panic!("failed to parse number as f64: {}", number.as_str()))
     }
 
     fn read_binary_number(&mut self) -> f64 {
@@ -1379,6 +1443,39 @@ comment
                 span: Span { start: 0, end: 2 },
                 kind: TokenKind::AssignOp(AssignOp::DivAssign),
             }]
+        );
+    }
+
+    #[test]
+    fn ts() {
+        assert_eq!(
+            lex("const foo: any = 1"),
+            vec![
+                Token {
+                    span: Span { start: 0, end: 5 },
+                    kind: TokenKind::Word(WordKind::Keyword(Keyword::Const)),
+                },
+                Token {
+                    span: Span { start: 6, end: 9 },
+                    kind: TokenKind::Word(WordKind::Identifier("foo".to_string())),
+                },
+                Token {
+                    span: Span { start: 9, end: 10 },
+                    kind: TokenKind::Colon,
+                },
+                Token {
+                    span: Span { start: 11, end: 14 },
+                    kind: TokenKind::Word(WordKind::Keyword(Keyword::Any)),
+                },
+                Token {
+                    span: Span { start: 15, end: 16 },
+                    kind: TokenKind::AssignOp(AssignOp::Assign),
+                },
+                Token {
+                    span: Span { start: 17, end: 18 },
+                    kind: TokenKind::Number { value: 1_f64 },
+                },
+            ]
         );
     }
 

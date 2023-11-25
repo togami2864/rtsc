@@ -1,7 +1,18 @@
 use rtsc_parser::Lexer;
 
 fn main() {
-    let code = "var x=10;";
+    let code = "class C extends null {
+        constructor() {
+            super();
+            return Object.create(null);
+        }
+    }
+
+    class D extends null {
+        constructor() {
+            return Object.create(null);
+        }
+    }";
     let l = Lexer::new(code);
     let (tokens, errors) = l.lex();
 

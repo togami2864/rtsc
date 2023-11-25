@@ -10,12 +10,15 @@ use rtsc_parser::run_lexer;
 use tracing::info;
 use walkdir::WalkDir;
 
-use crate::suite::{Case, SuiteSummary, TestResult, TestSuite};
+use crate::{
+    suite::{Case, SuiteSummary, TestResult, TestSuite},
+    utils::remove_bom,
+};
 
 const FIXTURES_NAME: &str = "lexer";
 const FIXTURES_DIR: &str = "tests/lexer";
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct LexerTestCase {
     filename: String,
     code: String,
@@ -28,7 +31,7 @@ impl Case for LexerTestCase {
     {
         Self {
             filename: filename.to_owned(),
-            code: code.to_owned(),
+            code: remove_bom(code).to_owned(),
         }
     }
 
@@ -81,7 +84,7 @@ impl TestSuite for LexerTestSuite {
                 let mut file = File::open(c).unwrap();
                 let mut contents = String::new();
                 file.read_to_string(&mut contents).unwrap();
-                LexerTestCase::new(c.to_str().unwrap(), &contents)
+                LexerTestCase::new(c.to_str().unwrap(), &mut contents)
             })
             .collect::<Vec<_>>();
 

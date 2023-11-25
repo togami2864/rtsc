@@ -1,8 +1,8 @@
 {
   "dir_name": "conformance",
   "total_count": 3116.0,
-  "success": 219.0,
-  "failure": 2249.0,
-  "panic": 648.0,
-  "coverage": 7.02824133504493
+  "success": 2212.0,
+  "failure": 517.0,
+  "panic": 387.0,
+  "coverage": 70.98844672657253
 }
