@@ -1,7 +1,7 @@
 use rtsc_parser::Lexer;
 
 fn main() {
-    let code = "0.1E-3";
+    let code = "var x=10;";
     let l = Lexer::new(code);
     let (tokens, errors) = l.lex();
 

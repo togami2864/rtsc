@@ -4,6 +4,7 @@ use suite::TestSuite;
 
 use std::io::Write;
 
+mod compiler;
 mod conformance;
 mod lexer;
 mod suite;
@@ -15,8 +16,10 @@ fn main() {
 
     let lexer_summary = LexerTestSuite::new().run();
     let conformance_summary = ConformanceTestSuite::new().run();
+    let compiler_summary = compiler::CompilerTestSuite::new().run();
 
-    writeln!(out, "---------- Summary ----------\n").expect("Unable to write summary");
+    writeln!(out, "---------- Summary(Lexer) ----------\n").expect("Unable to write summary");
     lexer_summary.show_and_write_summary(&mut out);
     conformance_summary.show_and_write_summary(&mut out);
+    compiler_summary.show_and_write_summary(&mut out);
 }

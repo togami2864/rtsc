@@ -1,0 +1,8 @@
+{
+  "dir_name": "compiler",
+  "total_count": 3021.0,
+  "success": 187.0,
+  "failure": 2675.0,
+  "panic": 159.0,
+  "coverage": 6.190003310162198
+}
